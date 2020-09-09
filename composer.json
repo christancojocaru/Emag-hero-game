@@ -1,0 +1,20 @@
+{
+    "name": "root/www",
+    "description": "Hero Game",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Cristian Cojocaru",
+            "email": "christancojocaru@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2.3",
+        "symfony/yaml": "^5.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
