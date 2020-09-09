@@ -29,11 +29,13 @@ class Handler
         $this->output
             ->newLine()
             ->writeEmpty()
-            ->addColor(Output::RED)
-            ->writeCenter($this->translator->trans('hello'))
+            ->writeCenter($this->output->getColor($this->translator->trans('hello'), Output::RED))
             ->writeEmpty();
 
-        new GameController();
+        $controller = new GameController();
+        $controller
+            ->setOpponents()
+            ->init();
     }
 
     public function end()

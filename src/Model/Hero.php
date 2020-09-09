@@ -90,8 +90,7 @@ class Hero
     {
         $powerCode = array_search($this->power, self::HERO_POWER);
         if ($powerCode === false) {
-            $this->output->writeError(sprintf("Setting not found for hero with power of \"%s\"", $powerCode));
-            exit;
+            Output::writeError(sprintf("Setting not found for hero with power of \"%s\"", $powerCode));
         }
         return $properties[$powerCode];
     }

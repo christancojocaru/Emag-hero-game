@@ -14,8 +14,7 @@ class YamlParser
         try {
             return Yaml::parseFile(ROOT . $fileName. ".yaml");
         } catch (ParseException $exception) {
-            $output = Output::getInstance();
-            $output->writeError($exception->getMessage());
+            Output::writeError($exception->getMessage());
             exit;
         }
     }

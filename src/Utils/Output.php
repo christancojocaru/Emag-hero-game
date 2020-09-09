@@ -11,11 +11,16 @@ class Output
     public const RED = '0;31';
     public const CYAN = '1;36';
     public const WHITE = '1;37';
+    private const SLEEP_KEY = "q%q%q%";
+    private const SLEEP_TIME = array(
+        "min"   => 1,
+        "max"   => 3
+    );
     /**
      * All the text to output
-     * @var string
+     * @var array
      */
-    private $output = '';
+    private $outputs = array();
     /**
      * @var self
      */
@@ -46,17 +51,17 @@ class Output
      */
     public function write(string $message): self
     {
-        $this->output .= $message;
+        $this->outputs[] = $message;
 
-        return $this->checkColored();
+        return $this;
     }
 
     /**
      * @param string $message
      */
-    public function writeError(string $message): void
+    public static function writeError(string $message): void
     {
-        echo "\n" . $this->getColor($message, self::RED). "\n";
+        echo "\n" . (new Output)->getColor($message, self::RED). "\n";
         exit;
     }
 
@@ -76,8 +81,9 @@ class Output
      */
     public function newLine(int $no = 1): self
     {
-        $this->output .= str_repeat("\n", $no);
-        return $this->checkColored();
+        $this->outputs[] = str_repeat("\n", $no);
+
+        return $this;
     }
 
     /**
@@ -86,10 +92,9 @@ class Output
      */
     public function writeEmpty(string $filler = self::SEPARATOR): self
     {
-        $this->output .= str_repeat($filler, WINDOW_WIDTH);
-        $this->output .= "\n";
+        $this->outputs[] = str_repeat($filler, WINDOW_WIDTH) . "\n";
 
-        return $this->checkColored();
+        return $this;
     }
 
     /**
@@ -99,6 +104,7 @@ class Output
     public function writeCenter(string $message): self
     {
         $len = $this->getLength($message);
+        $text = '';
         if ($len < WINDOW_WIDTH) {
             /**
              * This is for space around output text
@@ -106,24 +112,16 @@ class Output
              */
             $add = 2;
             $multiplier = (WINDOW_WIDTH - ($len + $add)) / 2;
-            if ($this->isColored) {
-                $this->output .= "\e[0m";
-                $this->output .= str_repeat(self::SEPARATOR, floor($multiplier));
-                $this->addColor($this->color);
-                $this->output .= ' ' . $message . ' ';
-                $this->output .= "\e[0m";
-                $this->output .= str_repeat(self::SEPARATOR, ceil($multiplier));
-            } else {
-                $this->output .= str_repeat(self::SEPARATOR, floor($multiplier));
-                $this->output .= ' ' . $message . ' ';
-                $this->output .= str_repeat(self::SEPARATOR, ceil($multiplier));
-            }
+            $text .= str_repeat(self::SEPARATOR, floor($multiplier));
+            $text .= ' ' . $message . ' ';
+            $text .= str_repeat(self::SEPARATOR, ceil($multiplier));
         } else {
-            $this->output .= $message;
+            $text .= $message;
         }
 
-//        $this->newLine();
-        return $this->checkColored();
+        $this->outputs[] = $text . "\n";
+
+        return $this;
     }
 
     /**
@@ -155,30 +153,17 @@ class Output
             }
         }
 
-        $this->output .= $text . "\n";
-
-        return $this->checkColored();
-    }
-
-    private function checkColored(): self
-    {
-        if ($this->isColored) {
-            $this->output .= "\e[0m";
-            $this->isColored = false;
-        }
+        $this->outputs[] = $text . "\n";
 
         return $this;
     }
 
     /**
-     * @param string $color
      * @return $this
      */
-    public function addColor(string $color): self
+    public function addSleep(): self
     {
-        $this->isColored = true;
-        $this->color = $color;
-        $this->output .= "\e[" . $color . ";40m";
+        $this->outputs[] = self::SLEEP_KEY;
         return $this;
     }
 
@@ -194,6 +179,12 @@ class Output
 
     public function outputAll()
     {
-        echo $this->output;
+        foreach ($this->outputs as $output) {
+            if ($output === self::SLEEP_KEY) {
+                sleep(rand(self::SLEEP_TIME['min'], self::SLEEP_TIME['max']));
+            } else {
+                echo $output;
+            }
+        }
     }
 }

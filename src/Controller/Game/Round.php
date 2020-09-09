@@ -5,7 +5,6 @@ namespace App\Controller\Game;
 
 
 use App\Model\Hero;
-use App\Utils\Calculator;
 use App\Utils\Output;
 
 /**
@@ -13,7 +12,7 @@ use App\Utils\Output;
  */
 class Round
 {
-    private const LUCKY_NUMBER =  7;
+    private const LUCKY_NUMBER = 1;
     /**
      * @var Hero
      */
@@ -82,6 +81,9 @@ class Round
         $this->defender->getAbilities()->setHealth($health - $damage);
     }
 
+    /**
+     * @return int
+     */
     private function calculateDamage(): int
     {
         return $this->striker->getAbilities()->getStrength() - $this->defender->getAbilities()->getDefence();
@@ -127,6 +129,9 @@ class Round
         return $luckyNumber === 1;
     }
 
+    /**
+     * @return bool
+     */
     private function isMagicShieldUsed(): bool
     {
         if ($this->defender->getSkills() === null) {

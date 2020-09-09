@@ -45,8 +45,7 @@ class Abilities
             if (property_exists($this, $ability)) {
                 $this->$ability = rand($values["min"], $values["max"]);
             } else {
-                $output = Output::getInstance();
-                $output->writeError("Abilities passed include extra data, please verify.");
+                Output::writeError("Abilities passed include extra data, please verify.");
             }
         }
     }
@@ -138,15 +137,14 @@ class Abilities
 
     /**
      * @param string $ability
-     * @return mixed
+     * @return mixed|void
      */
-    public function getVitalAbility(string $ability)
+    public function getAbility(string $ability)
     {
         if (property_exists($this, $ability)) {
             return $this->$ability;
         }
-        echo "Vital ability " . $ability . " not found";
-        exit;
+        Output::writeError("Ability " . $ability . " not found");
     }
 
     /**
@@ -159,8 +157,7 @@ class Abilities
             if (property_exists($this, $property)) {
                 array_push($abilities, $property);
             } else {
-                echo "Vital abilities not found. Please check line" . __LINE__ . " on class" . __CLASS__;
-                exit;
+                Output::writeError("Vital abilities not found. Please check line" . __LINE__ . " on class" . __CLASS__);
             }
         }
         return $abilities;

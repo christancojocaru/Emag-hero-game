@@ -6,7 +6,7 @@ namespace App\Controller\Game;
 
 use App\Model\Hero;
 
-class Props
+class GameProps
 {
     /**
      * @var Hero
@@ -37,6 +37,11 @@ class Props
      * Props constructor.
      */
     public function __construct()
+    {
+        $this->init();
+    }
+
+    private function init()
     {
         $this->missCounter[$this->super->getId()] = 0;
         $this->missCounter[$this->regular->getId()] = 0;

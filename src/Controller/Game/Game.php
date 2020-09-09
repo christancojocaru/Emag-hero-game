@@ -10,13 +10,14 @@ use App\Utils\Output;
 /**
  * @property Output output
  */
-class Game extends Props
+class Game extends GameProps
 {
     private const MAX_ROUNDS_PER_MATCH = 20;
     private const ATTACK_MESSAGE = "%s attack %s";
     private const ROUND_MESSAGE = "Round %u";
     private const MAX_ROUNDS_MESSAGE = "No one wins and the maximum %s round per match has reached";
     private const WINNER_MESSAGE = "The winner is %s";
+
     public const DAMAGE_TAKEN_MESSAGE = "Damage taken by %s is %u";
     public const DAMAGE_MISSED_MESSAGE = "%s missed his damage of %u";
     public const RAPID_STRIKE_MESSAGE = "%s uses his rapid strike skill on his opponent";
@@ -52,20 +53,22 @@ class Game extends Props
     {
         $this->output->writeCenter('GAME START');
         $this->setProps();
+        $this->printHeroStats(true);
 
         while (!$this->isFinished) {
-
             $striker = $this->turn ?? $this->determineFirstAttack();
             $defender = $this->getDefender($striker);
 
             $this->updateProps($striker, $defender);
 
             $this->printRoundNumber()
-                ->printHeroStats()
+//                ->printHeroStats()
                 ->printAttack($striker->getName(), $defender->getName());
 
             $round = new Round($striker, $defender, $this->roundNumber, $this);
             $round->attack();
+
+            $this->printHeroStats();
 
             $this->isFinished = $defender->getAbilities()->getHealth() <= 0;
             if (!$this->isFinished) {
@@ -102,15 +105,28 @@ class Game extends Props
     {
         $superSpeed = $this->super->getAbilities()->getSpeed();
         $regularSpeed = $this->regular->getAbilities()->getSpeed();
-
+        $factor = 'Speed';
         if ($superSpeed === $regularSpeed) {
+            $factor = 'Luck';
             $superLuck = $this->super->getAbilities()->getLuck();
             $regularLuck = $this->super->getAbilities()->getLuck();
-
-            return $superLuck > $regularLuck ? $this->super : $this->regular;
         }
 
-        return $superSpeed > $regularSpeed ? $this->super : $this->regular ;
+        $super = 'super' . $factor;
+        $regular = 'regular' . $factor;
+        $first = $$super > $$regular ? $this->super : $this->regular;
+
+        $this->output
+            ->newLine()
+            ->writeCenter(
+                sprintf(
+                    "First attack was determined with %s %s",
+                    $first->getName(),
+                    $this->output->getColor(strtolower($factor), Output::WHITE)
+                )
+            )
+            ->newLine();
+        return $first;
     }
 
     /**
@@ -142,7 +158,10 @@ class Game extends Props
      */
     private function printRoundNumber(): self
     {
-        $this->output->writeCenter(sprintf(self::ROUND_MESSAGE, $this->roundNumber));
+        $this->output
+            ->writeEmpty()
+            ->writeCenter(sprintf(self::ROUND_MESSAGE, $this->roundNumber))
+            ->addSleep();
 
         return $this;
     }
@@ -162,9 +181,10 @@ class Game extends Props
     }
 
     /**
+     * @param bool $all
      * @return $this
      */
-    private function printHeroStats(): self
+    private function printHeroStats(bool $all = false): self
     {
         $messages = array(
             'l' => $this->super->getName(),
@@ -173,10 +193,14 @@ class Game extends Props
         $this->output->writeSideBySide($messages, true);
 
         $vitalAbilities = $this->super->getAbilities()->getVitalAbilities();
+        if ($all) {
+            $vitalAbilities[] = 'speed';
+            $vitalAbilities[] = 'luck';
+        }
         foreach ($vitalAbilities as $vitalAbility) {
             $messages = array(
-                'l' => ucwords($vitalAbility) . ": " . $this->super->getAbilities()->getVitalAbility($vitalAbility),
-                'r' => ucwords($vitalAbility) . ": " . $this->regular->getAbilities()->getVitalAbility($vitalAbility),
+                'l' => ucwords($vitalAbility) . ": " . $this->super->getAbilities()->getAbility($vitalAbility),
+                'r' => ucwords($vitalAbility) . ": " . $this->regular->getAbilities()->getAbility($vitalAbility),
             );
             $this->output->writeSideBySide($messages);
         }

@@ -4,11 +4,6 @@
 namespace App\Utils;
 
 
-use Exception;
-
-/**
- * @property Output output
- */
 class Translator
 {
     /**
@@ -18,7 +13,6 @@ class Translator
 
     public function __construct()
     {
-        $this->output = Output::getInstance();
         $this->setTranslations();
     }
 
@@ -32,7 +26,7 @@ class Translator
 
     /**
      * @param string $trans
-     * @return mixed
+     * @return mixed|void
      */
     public function trans(string $trans): string
     {
@@ -40,6 +34,6 @@ class Translator
             return $this->translations[$trans];
         }
 
-        $this->output->writeError(sprintf("Translation \"%s\" does not exist!", $trans));
+        Output::writeError(sprintf("Translation \"%s\" does not exist!", $trans));
     }
 }

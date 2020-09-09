@@ -27,8 +27,7 @@ class Skills
             if (property_exists($this, $skill)) {
                 $this->$skill = $value;
             } else {
-                $output = Output::getInstance();
-                $output->writeError("Skills settings include extra data, please verify.");
+                Output::writeError("Skills settings include extra data, please verify.");
             }
         }
     }

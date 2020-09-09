@@ -9,7 +9,6 @@ use App\Utils\Output;
 use App\Utils\YamlParser;
 
 /**
- * @property Output output
  * @property Hero super
  * @property Hero regular
  */
@@ -17,23 +16,16 @@ class GameController
 {
     private CONST GRAND_HERO_NAME = 'Orderus';
 
-    public function __construct()
-    {
-        $this->output = Output::getInstance();
-        $this->setOpponents()
-            ->init();
-    }
-
-    private function init()
+    public function init()
     {
         $board = new Game($this->super, $this->regular);
         $board->start();
     }
 
     /**
-     * @return $this
+     * @return GameController
      */
-    private function setOpponents(): self
+    public function setOpponents(): self
     {
         $heroSetting = $this->getHeroSetting();
 
